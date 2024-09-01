@@ -1,0 +1,43 @@
+--------- Sales Analysis using SQL ---------------
+
+--select * from sales_data_sample
+
+---------------------------------
+select COUNT(ordernumber) from sales_data_sample
+select COUNT(distinct ordernumber) from sales_data_sample
+
+--1 Sales group by productline in  year 2004 and total sales is > 400,000
+select productline,round(SUM(sales),0) as Total_Sales from sales_data_sample
+where YEAR_ID = 2004
+group by productline 
+having round(SUM(sales),0) > 400000
+
+
+--2 Row Number(Rank) Sales Desc for customers 
+SELECT customername, ROUND(sales,0) Total_Sales ,
+ROW_NUMBER() OVER(ORDER BY sales desc) RowNumber
+FROM sales_data_sample
+where status = 'Shipped'
+
+--3 Rank Sales Desc for customers 
+SELECT customername, ROUND(sales,0) Total_Sales ,
+RANK() OVER(partition by customername order by sales desc) rnk
+FROM sales_data_sample
+where status = 'Shipped'
+
+--4 Count null values in Addressline2 column
+select COUNT( ordernumber) FROM sales_data_sample
+where addressline2 is null
+
+--5 Total sales by year and quarter
+select YEAR_ID, QTR_ID,  round(SUM(sales),0) Total_Sales FROM sales_data_sample
+group by YEAR_ID, QTR_ID order by YEAR_ID
+
+--6 count number of contact name in each state
+select STATE, count(distinct CONCAT(contactfirstname,' ',contactlastname))Count_FN
+FROM sales_data_sample  where state is not null
+group by STATE
+
+--7 Rank products by quantity
+select productline, COUNT(quantityordered) NO_Qty
+FROM sales_data_sample group by productline order by NO_Qty desc
